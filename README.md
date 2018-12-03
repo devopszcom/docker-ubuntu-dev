@@ -6,11 +6,7 @@ CLI for Dev, isolated by Docker
 
 ```bash
 # Clone tools
-mkdir tools
-cd tools
-
-git clone https://github.com/ahmetb/kubectx.git
-git clone https://github.com/jonmosco/kube-ps1.git
+./tools/clone.sh
 
 # Build
 make build
