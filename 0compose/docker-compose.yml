@@ -1,0 +1,42 @@
+#
+# Source code address
+# https://hub.docker.com/u/cuongtransc/
+#
+# Syntax: https://docs.docker.com/compose/compose-file/
+#
+# Source: https://hub.docker.com/_/wordpress/
+#
+
+version: "2.4"
+
+x-default: &default
+    networks:
+        - comp_default
+    domainname: devopsz.com
+    cpu_shares: 512
+    mem_limit: 500M
+    # init: true
+    # privileged: true
+    # restart: always
+    # stdin_open: true
+    # tty: true
+    logging:
+        driver: "json-file"
+        options:
+            max-size: "100M"
+            max-file: "3"
+
+services:
+    k8s:
+        << : *default
+        image: cuongtransc/ubuntu:18.04-dev
+        #ports:
+            #- "8080:8080"
+        #volumes:
+            #- ./root-data/:/root
+        hostname: k8s-ctx-dev
+
+networks:
+    comp_default:
+        external: true
+

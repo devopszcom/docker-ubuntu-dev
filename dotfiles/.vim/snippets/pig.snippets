@@ -1,0 +1,173 @@
+snippet docs
+	-- File: ${1:`Filename('$1.pig', 'foo.pig')`}
+	-- ${2:`g:snips_author`}, `strftime('%Y-%m-%d')`
+	-- Description: ${3}
+
+snippet setg set generics
+	set debug '${1:off}'
+	set job.name '${2:`Filename()`}'
+	set job.priority '${3:normal}'
+
+snippet setsc set snappy compression
+	-- job output compression
+	set mapred.output.compress true
+	set mapred.output.compression.codec org.apache.hadoop.io.compress.SnappyCodec
+	--intermediate map output compression
+	set mapred.compress.map.output true
+	set mapred.map.output.compression.codec org.apache.hadoop.io.compress.SnappyCodec
+	-- intermediate tmpfile compression
+	set pig.tmpfilecompression true
+	set pig.tmpfilecompression.codec org.apache.hadoop.io.compress.SnappyCodec 
+
+# REG and DEF
+snippet reg
+	REGISTER ${1};
+
+snippet dc define command
+	DEFINE ${1:alias} '${2:cmd}';
+
+snippet ds define ship
+	DEFINE ${1:alias} SHIP('${2:filepat}');
+
+snippet dsc define ship cache
+	DEFINE ${1:alias} SHIP('${2:filepat}') CACHE('${3:file#file}');
+
+snippet dss define stream ship using stdin, stdout
+	DEFINE ${1:alias} SHIP('${2:filepat}') INPUT(stdin USING PigStreaming('${3:,}')) OUTPUT(stdout USING PigStreaming('${4:$3}'));
+
+# 'Smart' REG
+snippet regloc register all jar files in ./
+	`system('find . -maxdepth 2 -name "*.jar" -type f -printf "REGISTER %f\n"')`
+
+snippet reglib register all jar files 
+	`system('find /usr/lib/pig -name "*.jar" -type f -printf "REGISTER %p\n"')`
+
+# LOAD
+snippet l load
+	LOAD '${1:loc}';
+
+snippet la load as
+	LOAD '${1:loc}' AS (${2:id:type});
+
+snippet lup load using PigStorage alt delim
+	LOAD '${1:loc}' USING PigStorage('${2:\0001}') ${3:AS ()};
+
+snippet lut load using TextLoader
+	LOAD '${1:loc}' USING TextLoader() ${2:AS ()};
+
+snippet lua load using AvroStorage
+	LOAD '${1:loc}' USING org.apache.pig.impl.io.avro.AvroStorage() ${2:AS ()};
+
+snippet luh load using HBaseStorage
+	LOAD 'hbase://${1:table}' USING org.apache.pig.backend.hadoop.hbase.HBaseStorage('${2:colLst,optStr}');
+
+# STORE
+snippet s store into
+	STORE ${1:A} INTO '${2:loc}';
+
+snippet sup store using pigstorage alt delim
+	STORE ${1:A} INTO '${2:loc}' USING PigStorage('${3:\0001}');
+
+snippet sub store using BinStorage
+	STORE ${1:A} INTO '${2:loc}' USING BinStorage();
+
+snippet supd storeo using PigDump
+	STORE ${1:A} INTO '${2:loc}' USING PigDump();
+
+snippet sua store using AvroStorage
+	STORE ${1:A} INTO '${2:loc}' USING org.apache.pig.impl.io.avro.AvroStorage(${3:'schema'});
+
+snippet sue store ElasticSearchStorage
+	STORE ${1:A} INTO 'es://${2:index/obj/}' USING com.infochimpselasticsearch.pig.ElasticSearchStorage();
+
+snippet sur store ReditStorer
+	STORE ${1:A} INTO 'dummy' USING com.hackdiary.pig.RedisStorer('${2:kv|set|hash}', '${3:localhost}');
+
+snippet suh store HbaseStorage
+	STORE ${1:A} INTO 'hbase://${2:table}' USING org.apache.pig.backend.hadoop.hbase.HBaseStorage('${3:cf:col cf:col}');
+
+# FOREACH
+snippet feg foreach generate
+	FOREACH ${1:A} GENERATE ${2:expr} ${3:AS };
+
+snippet fegf foreach generate flatten
+	FOREACH ${1:A} GENERATE FLATTEN(${2:group})${3:,B};
+
+# (CO)GROUP
+snippet gb group by
+	GROUP ${1:A} BY ${2:expr}${3: PARALLEL };
+
+snippet ga group all
+	GROUP ${1:A} ALL${2: PARALLEL };
+
+snippet cg
+	COGROUP ${1:A} BY ${2:A}${3: PARALLEL };
+
+# JOINS
+snippet ji normal inner join
+	JOIN ${1:A} BY ${2:col}, ${3:B} BY ${4:$2} ${5:PARALLEL };
+
+snippet ji replicated inner join
+	JOIN ${1:A} BY ${2:col}, ${3:B} BY ${4:$2} USING 'replicated' ${5:PARALLEL };
+
+snippet ji skewed inner join
+	JOIN ${1:A} BY ${2:col}, ${3:B} BY ${4:$2} USING 'skewed' ${5:PARALLEL };
+
+snippet ji merge inner join
+	JOIN ${1:A} BY ${2:col}, ${3:B} BY ${4:$2} USING 'merge' ${5:PARALLEL };
+
+snippet jo normal outer join
+	JOIN ${1:A} BY ${2:col} ${3:LEFT|RIGHT|FULL} ${4:OUTER}, ${5:B} BY ${6:$2} ${7:PARALLEL };
+
+snippet jo replicated outer join
+	JOIN ${1:A} BY ${2:col} ${3:LEFT|RIGHT|FULL} ${4:OUTER}, ${5:B} BY ${6:$2} USING 'replicated' ${7:PARALLEL };
+
+snippet jo skewed outer join
+	JOIN ${1:A} BY ${2:col} ${3:LEFT|RIGHT|FULL} ${4:OUTER}, ${5:B} BY ${6:$2} USING 'skewed' ${7:PARALLEL };
+
+snippet un 
+	UNION ${1:A}, ${2:B};
+
+# OTHERS
+snippet fil 
+	FILTER ${1:A} BY ${2:expr};
+
+snippet lim
+	LIMIT ${1:A} ${2:n}${3: PARALLEL };
+
+snippet ord
+	ORDER ${1:A} BY ${2:col} ${3:DESC|ASC}${4: PARALLEL };
+
+snippet str
+	STREAM ${1:A} THROUGH '${2:cmd|def}'${3: AS (id:type)};
+
+snippet cr
+	CROSS ${1:A}, ${2:B}${3: PARALLEL };
+
+snippet dst
+	DISTINCT ${1:A}${2: PARALLEL };
+
+snippet exp
+	EXPLAIN ${1:A};
+
+snippet des
+	DESCRIBE ${1:A};
+
+snippet ill
+	ILLUSTRATE ${1:A};
+
+snippet smp
+	SAMPLE ${1:A} ${2:0.01};
+
+snippet spl
+	SPLIT ${1:A} INTO ${2:X} IF ${3:expr}, ${4:Y} IF ${5:expr};	
+
+snippet du
+	DUMP ${1:A};
+
+# TYPES
+snippet ca
+	chararray
+
+snippet ba
+	bytearray
